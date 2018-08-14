@@ -22,12 +22,13 @@ public class Main {
             Utils.deleteFile(new File(explodedFolder));
 
             try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                DownloadUtil.download(configuration.getWarUrl(), explodedWar);
+            } catch (Exception e) {
+                Log.error("Can not download file. Reason: [%s]", e.getMessage());
+                Log.info("Unzipping old version");
 
-            ZipUtil.unzipArchive(zipFile);
+                ZipUtil.unzipArchive(zipFile);
+            }
         } catch (IOException e) {
             Log.error("Can not create zip file");
         }
