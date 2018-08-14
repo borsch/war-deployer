@@ -1,9 +1,6 @@
 package com.charlesworthgroup.deployer;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -11,7 +8,7 @@ public class DownloadUtil {
 
     private static final int BUFFER_SIZE = 4096;
 
-    public static void download(String fileURL, String fileName) throws IOException {
+    public static void download(String fileURL, File file) throws IOException {
         URL url = new URL(fileURL);
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
         int responseCode = httpConn.getResponseCode();
@@ -25,7 +22,7 @@ public class DownloadUtil {
             }
 
             InputStream inputStream = httpConn.getInputStream();
-            FileOutputStream outputStream = new FileOutputStream(fileName);
+            FileOutputStream outputStream = new FileOutputStream(file);
 
             int bytesRead;
             byte[] buffer = new byte[BUFFER_SIZE];

@@ -15,22 +15,44 @@ public class Main {
         String explodedFolder = cwd + "\\" + configuration.getExplodedName();
         String explodedWar = cwd + "\\" + configuration.getExplodedName() + ".war";
 
+        File tempFile = new File("temp-file");
+
         try {
-            File zipFile = ZipUtil.createZip(cwd + "\\", explodedFolder, explodedWar);
+            Log.info("Downloading file from [%s]", configuration.getWarUrl());
+
+            DownloadUtil.download(configuration.getWarUrl(), tempFile);
+        } catch (Exception e) {
+            Log.error("Can not download file. Reason: [%s]", e.getMessage());
+            return;
+        }
+
+        try {
+            Log.info("Executing stop cmd [%s]", configuration.getStopCmd());
+            executeCommand(configuration.getStopCmd());
+        } catch (InterruptedException | IOException e) {
+            Log.error("Can not execute stop CMD");
+            return;
+        }
+
+        try {
+            Log.info("Create ZIP arcive with old war file");
+
+            ZipUtil.createZip(cwd + "\\", explodedFolder, explodedWar);
 
             Utils.deleteFile(new File(explodedWar));
             Utils.deleteFile(new File(explodedFolder));
 
-            try {
-                DownloadUtil.download(configuration.getWarUrl(), explodedWar);
-            } catch (Exception e) {
-                Log.error("Can not download file. Reason: [%s]", e.getMessage());
-                Log.info("Unzipping old version");
-
-                ZipUtil.unzipArchive(zipFile);
-            }
+            tempFile.renameTo(new File(explodedWar));
         } catch (IOException e) {
             Log.error("Can not create zip file");
+        }
+
+        try {
+            Log.info("Executing start cmd [%s]", configuration.getStartCmd());
+
+            executeCommand(configuration.getStartCmd());
+        } catch (InterruptedException | IOException e) {
+            Log.error("Can not execute start CMD. Please do it manually");
         }
     }
 
@@ -61,6 +83,10 @@ public class Main {
                     configuration.setExplodedName(paramValue);
                 } else if (paramName.equals("new-war-url")) {
                     configuration.setWarUrl(paramValue);
+                } else if (paramName.equals("start-cmd")) {
+                    configuration.setStartCmd(paramValue);
+                } else if (paramName.equals("stop-cmd")) {
+                    configuration.setStopCmd(paramValue);
                 }
             }
 
@@ -72,6 +98,15 @@ public class Main {
 
             return null;
         }
+    }
+
+    private static void executeCommand(String cmd) throws IOException, InterruptedException {
+        if (cmd == null || cmd.isEmpty())
+            return;
+
+        Runtime run = Runtime.getRuntime();
+        Process pr = run.exec(cmd);
+        pr.waitFor();
     }
 
     private static final String CONFIGURATION_FILE = "config.cfg";

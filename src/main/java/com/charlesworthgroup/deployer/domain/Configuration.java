@@ -5,6 +5,8 @@ public class Configuration {
     private String explodedName;
     private String warUrl;
     private String currentDirectory;
+    private String startCmd;
+    private String stopCmd;
 
     public String getExplodedName() {
         return explodedName;
@@ -30,12 +32,30 @@ public class Configuration {
         this.currentDirectory = currentDirectory;
     }
 
+    public String getStartCmd() {
+        return startCmd;
+    }
+
+    public void setStartCmd(String startCmd) {
+        this.startCmd = startCmd;
+    }
+
+    public String getStopCmd() {
+        return stopCmd;
+    }
+
+    public void setStopCmd(String stopCmd) {
+        this.stopCmd = stopCmd;
+    }
+
     @Override
     public String toString() {
         return "Configuration{" +
                 "explodedName='" + explodedName + '\'' +
                 ", warUrl='" + warUrl + '\'' +
                 ", currentDirectory='" + currentDirectory + '\'' +
+                ", startCmd='" + startCmd + '\'' +
+                ", stopCmd='" + stopCmd + '\'' +
                 '}';
     }
 }
